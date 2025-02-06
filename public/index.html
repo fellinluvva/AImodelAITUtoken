@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Models Marketplace</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.6.1/web3.min.js"></script>
+
+</head>
+<body>
+    <h1>Welcome to the Marketplace</h1>
+    <header>
+        <div id="walletAddress">Wallet not connected</div>
+        <div id="tokenBalance">Token Balance: 0 AITU</div>
+        <button id="connectButton">Connect MetaMask</button>
+    </header>
+
+    <main>
+        <h1>AI Models for Sale</h1>
+        <div id="models-list">
+            <!-- Models will be dynamically inserted here -->
+        </div>
+
+        <h2>Create a Model Listing</h2>
+        <form id="create-model-form">
+            <input type="text" id="model-name" placeholder="Model Name" required>
+            <textarea id="model-description" placeholder="Model Description" required></textarea>
+            <input type="number" id="model-price" placeholder="Price in AITU" required>
+            <input type="file" id="model-file" required>
+            <button type="submit">Create Listing</button>
+        </form>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
