@@ -12,6 +12,12 @@ contract AstanaITUniversity_se2328 is ERC20 {
         uint256 timestamp
     );
 
+    event ListingCreated(uint256 indexed listingId, address seller, uint256 amount, uint256 price);
+
+    event ListingCancelled(uint256 indexed listingId);
+
+    event ListingPurchased(uint256 indexed listingId, address buyer);
+
     struct TransferRecord {
         address sender;
         address receiver;
@@ -19,7 +25,16 @@ contract AstanaITUniversity_se2328 is ERC20 {
         uint256 timestamp;
     }
 
+    struct Listing {
+        address seller;
+        uint256 amount;
+        uint256 price;
+        bool isActive;
+    }
+
     TransferRecord public recentTransfer;
+    mapping(uint256 => Listing) public listings;
+    uint256 public nextListingId;
 
     constructor() ERC20("AstanaITUniversity_se2328", "AITU2328") {
         _mint(msg.sender, 2000 * 10**decimals());
@@ -147,5 +162,45 @@ contract AstanaITUniversity_se2328 is ERC20 {
             }
         }
         return string(result);
+    }
+
+
+    function createListing(uint256 amount, uint256 price) external returns (uint256) {
+        require(amount > 0, "Amount must be greater than 0");
+        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
+
+        uint256 listingId = nextListingId++;
+        listings[listingId] = Listing({
+            seller: msg.sender,
+            amount: amount,
+            price: price,
+            isActive: true
+        });
+
+        emit ListingCreated(listingId, msg.sender, amount, price);
+        return listingId;
+    }
+
+    function cancelListing(uint256 listingId) external {
+        Listing storage listing = listings[listingId];
+        require(listing.isActive, "Listing is not active");
+        require(listing.seller == msg.sender, "Only the seller can cancel");
+
+        listing.isActive = false;
+        emit ListingCancelled(listingId);
+    }
+
+    function purchaseListing(uint256 listingId) external payable {
+        Listing storage listing = listings[listingId];
+        require(listing.isActive, "Listing is not active");
+        require(msg.value >= listing.price, "Insufficient ETH sent");
+
+        listing.isActive = false;
+
+        _transfer(listing.seller, msg.sender, listing.amount);
+
+        payable(listing.seller).transfer(msg.value);
+
+        emit ListingPurchased(listingId, msg.sender);
     }
 }
